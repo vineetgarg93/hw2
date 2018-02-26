@@ -11,10 +11,31 @@ class MoviesController < ApplicationController
   end
 
   def index
-    # @movies = Movie.all
-    @all_ratings = Movie.ratings
-    @sort_by = params[:sort_by]
-    @movies = Movie.order(@sort_by)
+  @all_ratings = Movie.ratings
+   redirect = false
+   @sort_by = params[:sort_by]
+   if (@sort_by)
+     session[:sort_by] = @sort_by
+   elsif session[:sort_by]
+     @sort_by = session[:sort_by]
+     redirect = true
+   end
+   @ratings ||= []
+   if params[:ratings]
+     @ratings = (params[:commit] == 'Refresh') ? params[:ratings].keys : params[:ratings]
+     session[:ratings] = @ratings
+   elsif session[:ratings]
+     @ratings = session[:ratings]
+     redirect = true
+   end
+   if @ratings.empty?
+     @movies = Movie.order(@sort_by)
+   else
+    @movies = Movie.where(:rating => @ratings).order(@sort_by)
+   end
+   if (redirect) 
+     redirect_to movies_path({:sort_by => @sort_by, :ratings => @ratings}) 
+   end
   end
 
   def new
