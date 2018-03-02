@@ -34,6 +34,7 @@ class MoviesController < ApplicationController
     @movies = Movie.where(:rating => @ratings).order(@sort_by)
    end
    if (redirect) 
+     flash.keep
      redirect_to movies_path({:sort_by => @sort_by, :ratings => @ratings}) 
    end
   end
